@@ -1,4 +1,4 @@
-export const staticDeckOfMemes = ["1", "2", "3"];
+export const staticDeckOfMemes = ["1", "2", "3", "4", "5", "6", "7", "8"];
 export const staticDeckOfPrompts = [
   "Kiedy Kulesza Znów Proponuje Spotkać Się W Pubie",
 ];

@@ -5,8 +5,9 @@ import {
 import { TScoreboard } from "@commonTypes/GameTypes";
 import { TCardsSelectedByPlayers, TPlayerCards } from "../../types/GameTypes";
 import { getRandomNumber } from "./utils";
+import { currentGame, gameSocket } from "../../../main";
 
-const PLAYER_HAND_SIZE = 4;
+const PLAYER_HAND_SIZE = 2;
 const NUMBER_OF_PLAYERS = 2;
 
 export class GameOfMemes {
@@ -24,6 +25,7 @@ export class GameOfMemes {
     this.players.push(username);
     this.playersCards[username] = this.generateCardsInHandForPlayer();
     this.scoreboard[username] = 0;
+    gameSocket.broadcastNewPlayer();
   }
 
   public playerSelectedCard(username: string, selectedCard: string) {
@@ -49,6 +51,7 @@ export class GameOfMemes {
       this.scoreboard[playerWithMaxVotes[0]]
         ? this.scoreboard[playerWithMaxVotes[0]]++
         : (this.scoreboard[playerWithMaxVotes[0]] = 1);
+      gameSocket.broadcastScoreboard();
     }
     this.roundCleanup();
   }
@@ -72,9 +75,14 @@ export class GameOfMemes {
     const cardsInHand: string[] = [];
     for (let i = 0; i < PLAYER_HAND_SIZE; i++) {
       const allPlayersCards = this.getAllPlayersCards();
-      const fileredDeckOfMems = Array.from(
+      const excludedPlayerCards = Array.from(
         new Set([...allPlayersCards, ...cardsInHand]),
       ) as string[];
+      const fileredDeckOfMems = this.deckOfMemes.filter(
+        (item) => !excludedPlayerCards.includes(item),
+      );
+
+      console.log(fileredDeckOfMems);
       cardsInHand.push(
         fileredDeckOfMems[getRandomNumber(fileredDeckOfMems.length)],
       );

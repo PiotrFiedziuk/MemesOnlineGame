@@ -6,11 +6,11 @@ class GameSocket extends Socket {
     this.initializeEvents();
   }
 
-  private initializeEvents() {
-    this.socketConnection.on("join_game", this.onJoinGame);
+  private initializeEvents() {}
+
+  public joinGame(username: string) {
+    this.socketConnection.emit("JOIN_GAME", username);
   }
-
-  private onJoinGame() {}
-
-  public selectCard(id: string) {}
 }
+
+export const gameSocket = new GameSocket("http://localhost:3001");
