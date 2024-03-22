@@ -22,7 +22,7 @@
 
     "typeRoots": ["index.d.ts","../memes-online-game-types/src/*"],
     "paths": {
-      "@types/*": ["../memes-online-game-types/src/*"],
+      "@projectTypes/*": ["../memes-online-game-types/src/*"],
     },
   },
   "include": ["src"],

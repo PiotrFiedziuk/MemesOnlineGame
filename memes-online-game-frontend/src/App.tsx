@@ -1,11 +1,11 @@
-import {TTest} from "@types/types.ts";
+import { Outlet } from "@tanstack/react-router";
 
 function App() {
-  const test: TTest = {lol: '12'};
-
-  console.log(test);
-
-  return <div className="bg-red-600">Hello, World!</div>;
+  return (
+    <div className="bg-gray-500 w-screen h-screen">
+      <Outlet />
+    </div>
+  );
 }
 
 export default App;
