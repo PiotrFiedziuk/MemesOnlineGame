@@ -1,0 +1,15 @@
+{
+  "name": "memes-online-game",
+  "version": "0.0.1",
+  "description": "Game About Memes",
+  "scripts": {
+    "dev:front": "cd memes-online-game-front && npm install && npm run dev",
+    "dev:back": "cd memes-online-game-back && npm install && npm run dev",
+    "dev": "concurrently \"npm run dev:back\" \"npm run dev:front\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "author": "",
+  "license": "ISC"
+}
