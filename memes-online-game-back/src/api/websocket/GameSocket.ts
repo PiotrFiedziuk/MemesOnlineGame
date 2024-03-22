@@ -1,32 +1,40 @@
-//ON - Z
+import { Server, Socket } from "socket.io";
+import { currentGame } from "../../../main";
 
-//INVOKE DO
+export class GameSocket {
+  private connections: any = {};
+  private socketConnection;
+  constructor() {
+    this.socketConnection = new Server(3001, { cors: { origin: "http" } });
+    this.initializeEvents();
+  }
 
-import {Server} from "socket.io";
+  private initializeEvents() {
+    this.socketConnection.on("connection", this.onConnection);
+  }
 
-class GameSocket {
-    private connection;
-    constructor() {
-        this.connection = new Server()
+  private initializeConnectionForUser(socket: Socket) {
+    socket.on("JOIN_GAME", (username: string) => {
+      this.connections[username] = socket;
+      currentGame.addPlayer(username);
+      this.initializeEventsForUser(username, socket);
+    });
+  }
 
-        this.connection.
-    }
+  private initializeEventsForUser(username: string, socket: Socket) {
+    socket.on("SELECT_CARD", (cardId: string) => {
+      currentGame.playerSelectedCard(username, cardId);
+    });
+    socket.on("VOTE_FOR_PLAYER", (votedPlayer: string) => {
+      currentGame.voteForPlayer(votedPlayer);
+    });
+  }
 
-    private initializeEvents(){
-        this.connection.on('connection',this.onConnection);
-    }
+  public invokeNewHandForPlayer(username: string, cards: string[]) {
+    this.connections[username]?.invoke("NEW_CARDS", cards);
+  }
 
-  private onConnection(socket){
-        //t
-  };
-
-  private onPlayerConnect;
-
-  private onPlayerDisconnect;
-
-  private invokeGameStarted;
-
-  private invokeScoreboardChange;
-
-  private invokeGiveNewCards;
+  private onConnection(socket: Socket) {
+    this.initializeConnectionForUser(socket);
+  }
 }
