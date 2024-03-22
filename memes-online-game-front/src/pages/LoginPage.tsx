@@ -9,13 +9,26 @@ export const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    const socket = io("http://localhost:3001", { transports: ["websocket"] });
+    const data = {
+      username: username,
+    };
+    fetch("http://localhost:3000/login", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    }).then((resp) => {
+      console.log(resp);
+    });
+
+    /*    const socket = io("http://localhost:3001", { transports: ["websocket"] });
     socket.emit("login", username);
     socket.on("loginRespond", (args) => {
       if (args === "ok") {
         navigate({ to: "/room" });
       }
-    });
+    });*/
   };
 
   return (

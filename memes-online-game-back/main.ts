@@ -1,8 +1,6 @@
-import express from "express";
 import { Server } from "socket.io";
+import { AuthApi } from "./src/api/authorization/AuthApi";
 
-const app = express();
-const port = 3000;
 const portWs = 3001;
 const ioServer = new Server(portWs, {
   cors: { origin: "http://localhost:5173", methods: ["GET", "POST"] },
@@ -10,6 +8,8 @@ const ioServer = new Server(portWs, {
 });
 
 const users: { username: string; points: number }[] = [];
+
+export const authApi = new AuthApi();
 
 ioServer.on("connect", (socket) => {
   socket.on("login", (args) => {
@@ -21,12 +21,4 @@ ioServer.on("connect", (socket) => {
 
 ioServer.on("connection", (socket) => {
   socket.emit("room", users);
-});
-
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
 });
