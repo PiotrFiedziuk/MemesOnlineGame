@@ -1,20 +1,21 @@
-import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
-import { ScoreBoard } from "../components/ScoreBoard.tsx";
+import { Modal } from "../components/Modal.tsx";
+import { PlayersHands } from "../components/PlayersHands.tsx";
+import { Table } from "../components/Table.tsx";
+import { UserInterface } from "../components/UserInterface.tsx";
+import { useGameDataStore } from "../stores/useGameDataStore.ts";
 
 export const RoomPage = () => {
-  const [users, setUsers] = useState<{ username: string; points: number }[]>(
-    [],
-  );
-  const socket = io("http://localhost:3001", { transports: ["websocket"] });
-
-  useEffect(() => {
-    socket.on("room", (args) => setUsers(args));
-  }, [users]);
+  const gameStatus = useGameDataStore((state) => state.gameStatus);
 
   return (
-    <div className="bg-white w-full h-full">
-      <ScoreBoard users={users} />
+    <div className="bg-white w-full h-full overflow-hidden">
+      <Modal
+        isVisible={gameStatus.displayModal}
+        text={gameStatus.modalMessage}
+      />
+      <PlayersHands />
+      <Table />
+      <UserInterface />
     </div>
   );
 };

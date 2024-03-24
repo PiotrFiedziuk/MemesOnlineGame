@@ -1,8 +1,8 @@
 import { Server, Socket } from "socket.io";
-import { currentGame } from "../../../main";
+import { currentGame, gameSocket } from "../../../main";
 
 export class GameSocket {
-  private connections: any = {};
+  private connections: { [username: string]: Socket } = {};
   private socketConnection;
   constructor() {
     this.socketConnection = new Server(3001, { cors: { origin: "http" } });
@@ -20,16 +20,25 @@ export class GameSocket {
       this.connections[username] = socket;
       currentGame.addPlayer(username);
       this.initializeEventsForUser(username, socket);
-      this.invokeEventsForUser(username, socket);
+      this.invokeEventsForUser(socket);
     });
   }
 
-  private invokeEventsForUser(username: string, socket: Socket) {
+  private invokeEventsForUser(socket: Socket) {
     socket.emit("SCOREBOARD_LIST", currentGame.scoreboard);
   }
 
   public invokeNewHandForPlayer(username: string, cards: string[]) {
-    this.connections[username]?.invoke("NEW_CARDS", cards);
+    this.connections[username].emit("NEW_CARDS", cards);
+  }
+
+  public invokeDrawCardForPlayers() {
+    Object.keys(this.connections).forEach((username) =>
+      this.connections[username].emit(
+        "NEW_CARDS",
+        currentGame.playersCards[username],
+      ),
+    );
   }
 
   public broadcastNewPlayer() {
@@ -37,15 +46,64 @@ export class GameSocket {
   }
 
   public broadcastScoreboard() {
-    this.socketConnection.send("SCOREBOARD_LIST", currentGame.scoreboard);
+    this.socketConnection.emit("SCOREBOARD_LIST", currentGame.scoreboard);
+  }
+
+  public broadcastPlayersCardsCount(playersCardsCount: {
+    [username: string]: number;
+  }) {
+    this.socketConnection.emit("PLAYERS_CARDS", playersCardsCount);
+  }
+
+  public broadcastPrompt() {
+    this.socketConnection.emit("PROMPT", currentGame.currentPrompt);
+  }
+
+  public broadcastSelectedCardsByPlayers(playersThatSelectedCard: string[]) {
+    this.socketConnection.emit("SELECTED_CARDS", {
+      isRevealed: false,
+      cards: playersThatSelectedCard,
+    });
+  }
+
+  public broadcastWaitingForPlayers(gameStatus: {
+    displayModal: boolean;
+    modalMessage: string;
+  }) {
+    this.socketConnection.emit("GAME_STATUS", gameStatus);
+  }
+
+  public broadcastRevealCards() {
+    this.socketConnection.emit("REVEAL_CARDS", {
+      isRevealed: true,
+      cards: Object.values(currentGame.cardsSelectedByPlayers),
+    });
+  }
+
+  public broadcastNewHand(username: string) {
+    this.connections[username].emit(
+      "NEW_CARDS",
+      currentGame.playersCards[username],
+    );
+  }
+
+  public broadcastServerMessage(text: string) {
+    this.socketConnection.emit("CHAT_SERVER_MESSAGE", text);
+  }
+
+  public broadcastMessageFromPlayer(textMessage: string) {
+    this.socketConnection.emit("PLAYER_MESSAGE", textMessage);
   }
 
   private initializeEventsForUser(username: string, socket: Socket) {
     socket.on("SELECT_CARD", (cardId: string) => {
       currentGame.playerSelectedCard(username, cardId);
     });
-    socket.on("VOTE_FOR_PLAYER", (votedPlayer: string) => {
-      currentGame.voteForPlayer(votedPlayer);
+    socket.on("VOTE_FOR_PLAYER", (votedCard: string) => {
+      currentGame.voteForPlayer(username, votedCard);
+    });
+    socket.on("CHAT_MESSAGE", (textMessage) => {
+      currentGame.addTextMessage(username, textMessage);
     });
   }
 

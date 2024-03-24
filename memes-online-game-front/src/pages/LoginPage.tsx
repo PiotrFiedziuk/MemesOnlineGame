@@ -1,9 +1,9 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { io } from "socket.io-client";
 import { Button } from "../components/Button.tsx";
 import { Input } from "../components/Input.tsx";
 import { gameSocket } from "../api/websockets/gameSocket.ts";
+import { useGameDataStore } from "../stores/useGameDataStore.ts";
 
 export const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -11,6 +11,8 @@ export const LoginPage = () => {
 
   const handleClick = () => {
     gameSocket.joinGame(username);
+    useGameDataStore.getState().setUsername(username);
+    navigate({ to: "/room" });
   };
 
   return (
