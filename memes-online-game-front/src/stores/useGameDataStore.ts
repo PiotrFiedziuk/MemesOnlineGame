@@ -8,7 +8,9 @@ export const useGameDataStore = create<TUseGameDataStoreTypes>()(
     scoreboard: {},
     playerHand: [],
     playersCards: {},
+    playersWhoVoted: [],
     promptCard: "",
+    selectedMemePreview: "",
     selectedCards: { isRevealed: false, cards: [] },
     gameStatus: {
       displayModal: false,
@@ -43,6 +45,11 @@ export const useGameDataStore = create<TUseGameDataStoreTypes>()(
         );
       });
     },
+    setSelectedMemePreview: (uri) => {
+      set((state) => {
+        state.selectedMemePreview = uri;
+      });
+    },
     setPromptCard: (prompt) => {
       set((state) => {
         state.promptCard = prompt;
@@ -58,8 +65,14 @@ export const useGameDataStore = create<TUseGameDataStoreTypes>()(
         state.gameStatus = gameStatus;
       });
     },
+    setPlayersWhoVoted: (players) => {
+      set((state) => {
+        state.playersWhoVoted = players;
+      });
+    },
     addMessageToChat: (text) => {
       set((state) => {
+        console.log("adding chat msg", text);
         state.chatMessages.push(text);
       });
     },

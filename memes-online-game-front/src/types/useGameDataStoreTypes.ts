@@ -12,6 +12,8 @@ export type TUseGameDataStorePropertiesTypes = {
   selectedCards: TSelectedCardsTypes;
   gameStatus: TGameStatusTypes;
   chatMessages: string[];
+  playersWhoVoted: string[];
+  selectedMemePreview: string;
 };
 
 export type TUseGameDataStoreActionsTypes = {
@@ -23,6 +25,8 @@ export type TUseGameDataStoreActionsTypes = {
   setSelectedCards: (selectedCards: TSelectedCardsTypes) => void;
   setGameStatus: (gameStatus: TGameStatusTypes) => void;
   addMessageToChat: (text: string) => void;
+  setPlayersWhoVoted: (players: string[]) => void;
+  setSelectedMemePreview: (uri: string) => void;
 };
 
 type TPlayersCardsTypes = { [username: string]: number };
@@ -32,4 +36,9 @@ type TSelectedCardsTypes = { isRevealed: boolean; cards: string[] };
 type TGameStatusTypes = {
   displayModal: boolean;
   modalMessage: string;
+};
+
+type TMessageType = {
+  timestamp: number;
+  msg: string;
 };

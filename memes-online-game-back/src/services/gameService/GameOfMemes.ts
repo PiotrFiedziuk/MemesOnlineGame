@@ -4,7 +4,7 @@ import {
 } from "../../assets/staticDecks";
 import { TScoreboard } from "@commonTypes/GameTypes";
 import { TCardsSelectedByPlayers, TPlayerCards } from "../../types/GameTypes";
-import { getRandomNumber } from "./utils";
+import { getCurrentParsedTime, getRandomNumber } from "./utils";
 import { gameSocket } from "../../../main";
 
 const PLAYER_HAND_SIZE = 4;
@@ -78,6 +78,7 @@ export class GameOfMemes {
           ? this.currentScores[username]++
           : (this.currentScores[username] = 1);
       this.numberOfVotes++;
+      gameSocket.broadcastPlayersThatVoted(this.playersThatVoted);
     }
 
     if (this.numberOfVotes === NUMBER_OF_PLAYERS) this.selectWinner();
@@ -182,7 +183,9 @@ export class GameOfMemes {
 
   public addTextMessage(username: string, textMessage: string) {
     this.chatLogs.push({ [username]: textMessage });
-    gameSocket.broadcastMessageFromPlayer(`${username}: ${textMessage}`);
+    gameSocket.broadcastMessageFromPlayer(
+      `[${getCurrentParsedTime()}] ${username}: ${textMessage}`,
+    );
   }
 
   private roundCleanup() {

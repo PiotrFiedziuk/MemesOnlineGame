@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { currentGame, gameSocket } from "../../../main";
+import { currentGame } from "../../../main";
 
 export class GameSocket {
   private connections: { [username: string]: Socket } = {};
@@ -17,6 +17,8 @@ export class GameSocket {
 
   private initializeConnectionForUser(socket: Socket) {
     socket.on("JOIN_GAME", (username: string) => {
+      if (currentGame.players.includes(username)) return;
+      else socket.emit("JOINED_SUCCESSFULLY");
       this.connections[username] = socket;
       currentGame.addPlayer(username);
       this.initializeEventsForUser(username, socket);
@@ -42,7 +44,10 @@ export class GameSocket {
   }
 
   public broadcastNewPlayer() {
-    this.socketConnection.send("PLAYER_LISTS", currentGame.players);
+    this.socketConnection.emit("PLAYER_LISTS", currentGame.players);
+  }
+  public broadcastResetGame() {
+    this.socketConnection.emit("GAME_RESETED");
   }
 
   public broadcastScoreboard() {
@@ -56,6 +61,7 @@ export class GameSocket {
   }
 
   public broadcastPrompt() {
+    this.broadcastPlayersThatVoted([]);
     this.socketConnection.emit("PROMPT", currentGame.currentPrompt);
   }
 
@@ -71,6 +77,10 @@ export class GameSocket {
     modalMessage: string;
   }) {
     this.socketConnection.emit("GAME_STATUS", gameStatus);
+  }
+
+  public broadcastPlayersThatVoted(playersList: string[]) {
+    this.socketConnection.emit("PLAYERS_VOTED", playersList);
   }
 
   public broadcastRevealCards() {

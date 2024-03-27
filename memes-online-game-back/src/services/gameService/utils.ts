@@ -6,3 +6,8 @@ const getMemesFromDeck = (deck: string[], numberOfMems: number) => {
 export const getRandomNumber = (max: number) => {
   return Math.floor(Math.random() * max);
 };
+
+export const getCurrentParsedTime = () => {
+  const current = new Date();
+  return `${current.getHours()}:${current.getMinutes()}:${current.getSeconds()}`;
+};

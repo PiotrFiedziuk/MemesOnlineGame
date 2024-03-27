@@ -3,6 +3,7 @@ import { PlayersHands } from "../components/PlayersHands.tsx";
 import { Table } from "../components/Table.tsx";
 import { UserInterface } from "../components/UserInterface.tsx";
 import { useGameDataStore } from "../stores/useGameDataStore.ts";
+import { MemePreview } from "../components/MemePreview.tsx";
 
 export const RoomPage = () => {
   const gameStatus = useGameDataStore((state) => state.gameStatus);
@@ -13,6 +14,7 @@ export const RoomPage = () => {
         isVisible={gameStatus.displayModal}
         text={gameStatus.modalMessage}
       />
+      <MemePreview />
       <PlayersHands />
       <Table />
       <UserInterface />

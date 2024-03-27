@@ -1,5 +1,6 @@
 import { useGameDataStore } from "../../stores/useGameDataStore.ts";
 import { Socket } from "./socket.ts";
+import { router } from "../../providers/Routing.tsx";
 
 class GameSocket extends Socket {
   constructor(uri: string) {
@@ -8,6 +9,9 @@ class GameSocket extends Socket {
   }
 
   private initializeEvents() {
+    this.onBroadcastResetGame();
+    this.onBroadcastPlayersVoted();
+    this.onJoinedSuccessfully();
     this.onBroadcastWaitingForPlayers();
     this.onBroadcastScoreboard();
     this.onNewHandForPlayer();
@@ -21,7 +25,6 @@ class GameSocket extends Socket {
 
   public joinGame(username: string) {
     this.socketConnection.emit("JOIN_GAME", username);
-    this.initializeEvents();
   }
 
   private onBroadcastScoreboard() {
@@ -30,10 +33,26 @@ class GameSocket extends Socket {
     });
   }
 
+  private onBroadcastResetGame() {
+    this.socketConnection.on("GAME_RESETED", () => {
+      window.location.pathname = "/login";
+    });
+  }
+
+  private onJoinedSuccessfully() {
+    this.socketConnection.on("JOINED_SUCCESSFULLY", () => {
+      router.navigate({ to: "/room" });
+    });
+  }
+
   private onBroadcastPlayerCards() {
     this.socketConnection.on("PLAYERS_CARDS", (args) => {
-      console.log(args);
       useGameDataStore.getState().setPlayersCards(args);
+    });
+  }
+  private onBroadcastPlayersVoted() {
+    this.socketConnection.on("PLAYERS_VOTED", (players) => {
+      useGameDataStore.getState().setPlayersWhoVoted(players);
     });
   }
 
@@ -74,9 +93,9 @@ class GameSocket extends Socket {
   }
 
   private onBroadcastPlayerMessage() {
-    this.socketConnection.on("PLAYER_MESSAGE", (args) =>
-      useGameDataStore.getState().addMessageToChat(args),
-    );
+    this.socketConnection.on("PLAYER_MESSAGE", (args) => {
+      useGameDataStore.getState().addMessageToChat(args);
+    });
   }
 
   public invokeSelectCard(cardId: string) {
@@ -88,8 +107,11 @@ class GameSocket extends Socket {
   }
 
   public invokeChatMessage(textMessage: string) {
+    console.log("invokingchatmessage", textMessage);
     this.socketConnection.emit("CHAT_MESSAGE", textMessage);
   }
 }
 
-export const gameSocket = new GameSocket("http://localhost:3001");
+const gameSocket = new GameSocket("http://localhost:3001");
+
+export { gameSocket };
